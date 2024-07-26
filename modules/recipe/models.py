@@ -10,6 +10,8 @@ class Recipe(db.Model):
     cost = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    deleted = db.Column(db.Boolean, default=False)
+    deleted_at = db.Column(db.DateTime)
 
     def to_dict(self, include_timestamps=False):
         data = {
@@ -61,6 +63,8 @@ class Recipe(db.Model):
         db.session.commit()
 
     def delete(self):
-        db.session.delete(self)
+        setattr(self, "deleted", True)
+        setattr(self, "deleted_at", datetime.now)
+        # db.session.delete(self)
         db.session.commit()
 

@@ -7,7 +7,7 @@ recipe_api = Blueprint('recipe_api', __name__)
 @recipe_api.route('/', methods=['GET'])
 def get_recipes():
     try:
-        items = Recipe.query.order_by(Recipe.updated_at.desc()).limit(10).all()
+        items = Recipe.query.filter_by(deleted=False).order_by(Recipe.updated_at.desc()).limit(10).all()
 
         current_app.logger.info("Fetched top 10 recipes")
 
@@ -48,7 +48,7 @@ def create_recipe():
 def get_recipe(id):
     try:
         recipe = Recipe.query.get(id)
-        if(recipe):
+        if(recipe and recipe.deleted == False):
             resp = {
                 "message": "Recipe details by id",
                 "recipe": [recipe.to_dict()]
@@ -64,7 +64,7 @@ def update_recipe(id):
     try:
         data = request.json
         recipe = Recipe.query.get(id)
-        if(recipe):
+        if(recipe and recipe.deleted == False):
             recipe.update(data)
             current_app.logger.info("Recipe {id} updated".format(id=recipe.id))
 
@@ -89,7 +89,7 @@ def update_recipe(id):
 def delete_recipe(id):
     try:
         recipe = Recipe.query.get(id)
-        if(recipe):
+        if(recipe and recipe.deleted == False):
             recipe.delete()
 
             current_app.logger.info("Recipe {id} removed".format(id=recipe.id))
